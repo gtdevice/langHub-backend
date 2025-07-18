@@ -4,7 +4,7 @@ go to the articles: GET /articles(language, level, category) - output: {articleI
 choose an article to work with: chatForArticle(articleId) - output: {id, title, adaptedText, thumbnail, category, language, level, metadata:{dictionary, Grammar}, Dialog[dialog messages]}
 send a message to the article: sendAMessageToArticle(articleId, dialogId, message) - output (answer from the llm): {id, dialogId, sampleCorrection, followupQuestion, metadata:{dictionary, Grammar}}
 
-### 1. Get Article List
+### 1. Get Article List [v]
 This endpoint remains the same. It's just for Browse potential articles.
 
 Endpoint: GET /articles
@@ -23,7 +23,7 @@ Response:
 ] 
 ```
 
-### 2. Get or Create a Dialog for an Article
+### 2. Get or Create a Dialog for an Article [v]
 This is the new, key endpoint. When a user clicks an article, they are fetching their personal dialog for it. If it doesn't exist, the backend creates it. On the backend we add userID from auth context
 
 Endpoint: GET /dialogs/{articleId}
@@ -63,7 +63,7 @@ Example Response (200 OK):
 }
 ```
 
-### 3. Send a Message to a Dialog
+### 3. Send a Message to a Dialog [v]
 Messages are now sent to a specific dialogId, not just a generic endpoint. This makes the action unambiguous.
 
 Endpoint: POST /dialogs/{dialogId}/messages

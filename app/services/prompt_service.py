@@ -119,3 +119,32 @@ Output JSON schema:
 }}
 </user input>
         """
+
+    @staticmethod
+    def get_dialog_follow_up_prompt() -> str:
+        return """
+        <System>
+        You are a language coach. Your goal is to help a user practice a language by having a conversation about an article they have read.
+        You will receive the conversation history and the user's latest message.
+        Your response must be in JSON format.
+        </System>
+
+        <User>
+        Here is the context for your response:
+        - Conversation History: {dialogHistory}
+        - Vocabulary to focus on: {vocabulary}
+        - Grammar topics to focus on: {grammarTopics}
+        - User's latest message: {lastUserMessage}
+
+        Your task:
+        1.  Review the user's message for correctness.
+        2.  Provide a simple, encouraging correction if needed.
+        3.  Ask a relevant, open-ended follow-up question to keep the conversation going.
+        4.  Ensure your entire output adheres strictly to the following JSON schema.
+        </User>
+
+        <AI>
+        {format_instructions}
+        </AI>
+        """
+

@@ -24,3 +24,25 @@ class DialogResponse(BaseModel):
 
 class SendMessageRequest(BaseModel):
     message: str
+
+class SimpleMessage(BaseModel):
+    sender: str
+    text: str
+
+class DialogFollowUPRequestLLMSchema(BaseModel):
+    dialogHistory: List[SimpleMessage]
+    lastUserMessage: str
+    vocabulary: List[str]
+    grammarTopics: List[str]
+
+class Correction(BaseModel):
+    sampleCorrection: str
+
+class CoachResponse(BaseModel):
+    text: str
+    metadata: Dict[str, Any]
+
+class DialogFollowUpResponseLLMSchema(BaseModel):
+    userMessage: str
+    corrections: Correction
+    coachResponse: CoachResponse
