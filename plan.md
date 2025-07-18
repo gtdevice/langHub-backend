@@ -104,3 +104,104 @@ Example Response (200 OK): (Response structure is the same, but the context is n
     }
 }
 ```
+
+## DB Schema
+
+```sql
+-- =================================================================
+-- Articles Tables
+-- =================================================================
+
+-- Create the 'articles' table to store the original, source content.
+CREATE TABLE public.articles (
+  id BIGSERIAL PRIMARY KEY,
+  original_text TEXT NOT NULL,
+  category TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.articles IS 'Stores original, unadapted article content.';
+
+-- Create the 'adapted_articles' table for different versions of an article.
+-- Each row is a specific adaptation for a language and level.
+CREATE TABLE public.adapted_articles (
+  id BIGSERIAL PRIMARY KEY,
+  original_article_id BIGINT NOT NULL REFERENCES public.articles(id) ON DELETE CASCADE,
+  language TEXT NOT NULL,
+  level TEXT NOT NULL,
+  title TEXT NOT NULL,
+  thumbnail_url TEXT,
+  intro TEXT,
+  adapted_text TEXT NOT NULL,
+  metadata JSONB NOT NULL,
+  dialogue_starter_question TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.adapted_articles IS 'Stores versions of articles adapted for specific languages and levels.';
+COMMENT ON COLUMN public.adapted_articles.dialogue_starter_question IS 'The initial question to start a conversation with the user.';
+COMMENT ON COLUMN public.adapted_articles.metadata IS 'Stores translation of the article and its words.';
+
+-- =================================================================
+-- Dialogue Tables
+-- =================================================================
+
+-- Create the 'dialogues' table to store conversation threads.
+-- This table now links to a specific adapted article.
+CREATE TABLE public.dialogues (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  adapted_article_id BIGINT NOT NULL REFERENCES public.adapted_articles(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.dialogues IS 'Stores individual dialogue sessions/threads.';
+COMMENT ON COLUMN public.dialogues.adapted_article_id IS 'Links the dialogue to a specific version of an article.';
+
+-- Create the 'messages' table to store each message within a dialogue.
+CREATE TABLE public.messages (
+  id BIGSERIAL PRIMARY KEY,
+  dialogue_id uuid NOT NULL REFERENCES public.dialogues(id) ON DELETE CASCADE,
+  speaker TEXT NOT NULL CHECK (speaker IN ('User', 'AI')),
+  content JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE public.messages IS 'Stores each message within a dialogue.';
+COMMENT ON COLUMN public.messages.content IS 'The actual message content, stored as a flexible JSONB object.';
+
+
+-- =================================================================
+-- Row Level Security (RLS) Policies
+-- =================================================================
+
+-- Enable RLS for all tables.
+ALTER TABLE public.articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.adapted_articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.dialogues ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+-- Policies for Articles: Allow any authenticated user to read articles.
+CREATE POLICY "Authenticated users can read articles"
+ON public.articles FOR SELECT
+USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can read adapted articles"
+ON public.adapted_articles FOR SELECT
+USING (auth.role() = 'authenticated');
+
+-- Policies for Dialogues: Users can only manage their own data.
+CREATE POLICY "Users can manage their own dialogues"
+ON public.dialogues FOR ALL
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can manage messages in their own dialogues"
+ON public.messages FOR ALL
+USING (
+  EXISTS (
+    SELECT 1
+    FROM public.dialogues d
+    WHERE d.id = messages.dialogue_id AND d.user_id = auth.uid()
+  )
+);
+```
