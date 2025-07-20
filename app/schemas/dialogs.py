@@ -1,14 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 
-class Article(BaseModel):
-    articleId: str
-    title: str
-    adaptedText: str
-    category: str
-    language: str
-    level: str
-    metadata: Dict[str, Any]
+from app.schemas.articles import AdaptedArticleData
 
 class Message(BaseModel):
     messageId: str
@@ -19,7 +12,7 @@ class Message(BaseModel):
 
 class DialogResponse(BaseModel):
     dialogId: str
-    article: Article
+    article: AdaptedArticleData
     messages: List[Message]
 
 class SendMessageRequest(BaseModel):

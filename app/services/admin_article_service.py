@@ -3,10 +3,10 @@ from app.services.llmclient import callLLM
 from app.services.prompt_service import PromptService
 from supabase import Client
 import httpx
-from app.schemas.articles import AdaptedArticleCreate
+from app.schemas.articles import AdaptedArticleData
 from app.schemas.admin import ProcessedArticleResponse
 
-async def _save_adapted_article(article_data: AdaptedArticleCreate, supabase: Client) -> None:
+async def _save_adapted_article(article_data: AdaptedArticleData, supabase: Client) -> None:
     """
     Saves the adapted article to the database.
     """
@@ -49,7 +49,8 @@ async def adapt_article(
     )
 
     # The metadata from the LLM is a dict. We need to convert it to a JSON string.
-    adapted_article_data = AdaptedArticleCreate(
+    adapted_article_data = AdaptedArticleData(
+        id=None,  # Let the database assign the ID
         original_article_id=article_id,
         language=target_lang,
         level=language_level,

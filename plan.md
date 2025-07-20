@@ -26,9 +26,9 @@ Response:
 ### 2. Get or Create a Dialog for an Article [v]
 This is the new, key endpoint. When a user clicks an article, they are fetching their personal dialog for it. If it doesn't exist, the backend creates it. On the backend we add userID from auth context
 
-Endpoint: GET /dialogs/{articleId}
+Endpoint: GET /dialogs/{adaptedArticleId}
 
-Description: Retrieves the user's specific dialog for a given articleId. The backend uses the authenticated user's ID and the articleId to find or create the dialog. This ensures every user gets their own private chat session with the article.
+Description: Retrieves the user's specific dialog for a given adaptedArticleId. The backend uses the authenticated user's ID and the articleId to find or create the dialog. This ensures every user gets their own private chat session with the article.
 
 Example Response (200 OK):
 
@@ -37,7 +37,7 @@ Example Response (200 OK):
 {
   "dialogId": "dlg_abc_789",
   "article": {
-    "articleId": "art_123",
+    "adaptedArticleId": "art_123",
     "title": "Die Zukunft der deutschen Industrie",
     "adaptedText": "Die Zukunft der deutschen Industrie wird vom Klimawandel geprägt...",
     "category": "Technology",

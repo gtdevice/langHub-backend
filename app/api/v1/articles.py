@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, Query
 from typing import List, Optional
 from supabase import Client
 from app.api.deps import get_supabase_client
-from app.schemas.articles import ArticleListItem
+from app.schemas.articles import AdaptedArticleData
 from app.services.articles import get_articles
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ArticleListItem])
+@router.get("/", response_model=List[AdaptedArticleData])
 async def get_article_list(
     category: Optional[str] = Query(None, description="Filter by category"),
     language: Optional[str] = Query(None, description="Filter by language"),

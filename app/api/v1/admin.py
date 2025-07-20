@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Any, Dict
 from app.api.deps import get_current_user_supabase_client
 from app.schemas.admin import ProcessArticleRequest
-from app.services.article_service import adapt_article
+from app.services.admin_article_service import adapt_article
 from supabase import Client
 
 router = APIRouter()
