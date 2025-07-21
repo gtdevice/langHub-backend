@@ -23,6 +23,7 @@ class SimpleMessage(BaseModel):
     text: str
 
 class DialogFollowUPRequestLLMSchema(BaseModel):
+    article: str
     dialogHistory: List[SimpleMessage]
     lastUserMessage: str
     vocabulary: List[str]

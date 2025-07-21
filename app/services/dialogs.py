@@ -1,6 +1,7 @@
 from supabase import Client
 from app.schemas.dialogs import DialogResponse, SendMessageRequest
 from app.services.articles import get_article_by_id
+from app.services.prompt_service import PromptService
 
 async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_id: int) -> DialogResponse:
     # First, try to find an existing dialognew_dialog_response
@@ -26,18 +27,6 @@ async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_i
 
     if not new_dialog_response.data:
         raise Exception("Failed to create dialog")
-
-    # new_dialog_data = new_dialog_response.data[0]
-
-    # Fetch the newly created dialog with all related data
-    # created_dialog_response = supabase.table("dialogues") \
-    #     .select("*, adapted_articles(*), messages(*)") \
-    #     .eq("id", new_dialog_data['id']) \
-    #     .single() \
-    #     .execute()
-
-    # if not created_dialog_response.data:
-    #     raise Exception("Failed to fetch created dialog")
 
     dialog_data = new_dialog_response.data[0]
     # get adapted article details
@@ -66,22 +55,12 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
     if not user_message_response.data:
         raise Exception("Failed to save user message")
 
-    # Fetch dialog context (article + messages)
-    dialog_response = supabase.table("dialogues") \
-        .select("*, adapted_articles(*), messages(*)") \
-        .eq("id", dialog_id) \
-        .single() \
-        .execute()
-
-    if not dialog_response.data:
-        raise Exception("Failed to fetch dialog context")
-
-    dialog_data = dialog_response.data
-    article = dialog_data['adapted_articles']
-    messages = dialog_data['messages']
+    # Fetch dialog context (adapted_article_text and messages from whole dialog)
+    # article =
+    # messages =
 
     # Sort messages by created_at
-    messages_sorted = sorted(messages, key=lambda x: x['created_at'])
+    # messages_sorted = sorted(messages, key=lambda x: x['created_at'])
 
     # Build conversation history for LLM
     from app.schemas.dialogs import SimpleMessage
@@ -92,20 +71,17 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
             text=msg['content']['text']
         ))
 
-    # Get vocabulary and grammar topics from article metadata
-    vocabulary = article.get('metadata', {}).get('vocabulary', [])
-    grammar_topics = article.get('metadata', {}).get('grammarTopics', [])
 
     # Get prompt template
-    from app.services.prompt_service import PromptService
+
     prompt_template = PromptService.get_dialog_follow_up_prompt()
 
     # Prepare LLM arguments
     prompt_args = {
         "dialogHistory": history,
-        "lastUserMessage": message.message,
-        "vocabulary": vocabulary,
-        "grammarTopics": grammar_topics
+        "lastUserMessage": messages,
+        "vocabulary": None,
+        "grammarTopics": None
     }
 
     # Call LLM
