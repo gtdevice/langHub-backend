@@ -56,11 +56,28 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
         raise Exception("Failed to save user message")
 
     # Fetch dialog context (adapted_article_text and messages from whole dialog)
-    # article =
-    # messages =
+    dialogs_data = supabase.table("dialogues").select("id, adapted_article_id").eq("id", dialog_id).single().execute()
+    if not dialogs_data.data:
+        raise Exception("Dialog not found")
+    
+    adapted_article_id = dialogs_data.data["adapted_article_id"]
+    
+    # Get adapted article text and metadata
+    adapted_article = supabase.table("adapted_articles").select("id, adapted_text").eq("id", adapted_article_id).single().execute()
+    if not adapted_article.data:
+        raise Exception("Adapted article not found")
+    
+    adapted_article_data = adapted_article.data
+    adapted_text = adapted_article_data["adapted_text"]
 
-    # Sort messages by created_at
-    # messages_sorted = sorted(messages, key=lambda x: x['created_at'])
+    # Extract vocabulary and grammar from article metadata
+    vocabulary = []
+    grammar_topics = []
+    
+    # Get all messages in the dialog
+    messages_response = supabase.table("messages").select("*").eq("dialogue_id", dialog_id).execute()
+    messages = messages_response.data
+    messages_sorted = sorted(messages, key=lambda x: x['created_at'])
 
     # Build conversation history for LLM
     from app.schemas.dialogs import SimpleMessage
@@ -76,12 +93,17 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
 
     prompt_template = PromptService.get_dialog_follow_up_prompt()
 
-    # Prepare LLM arguments
-    prompt_args = {
-        "dialogHistory": history,
-        "lastUserMessage": messages,
-        "vocabulary": None,
-        "grammarTopics": None
+    # Prepare LLM request using schema
+    from app.schemas.dialogs import DialogFollowUPRequestLLMSchema
+    llm_request = DialogFollowUPRequestLLMSchema(
+        article=adapted_text,
+        dialogHistory=history,
+        lastUserMessage=message.message,
+        vocabulary=vocabulary,
+        grammarTopics=grammar_topics
+    )
+    additional_args = {
+        "lang_level": "B2"  # Example language level, can be dynamic based on user profile
     }
 
     # Call LLM
@@ -90,7 +112,7 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
     try:
         llm_response = await callLLM(
             prompt_template_str=prompt_template,
-            prompt_args=prompt_args,
+            prompt_args=llm_request.dict() | additional_args,
             output_schema=DialogFollowUpResponseLLMSchema
         )
         ai_text = llm_response.coachResponse.text
@@ -98,19 +120,22 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
         # Fallback to placeholder on error
         ai_text = "I encountered an error. Please try again."
 
-    # Save actual AI response
+    # Save actual AI response with metadata
     ai_message_response = supabase.table("messages") \
         .insert({
             "dialogue_id": dialog_id,
             "speaker": "AI",
-            "content": {"text": ai_text}
+            "content": {
+                "text": ai_text,
+                "metadata": llm_response.dict()
+            }
         }) \
         .execute()
 
     if not ai_message_response.data:
         raise Exception("Failed to save AI message")
 
-    # Fetch all messages for the dialog
+    # Fetch all messages for the dialog including the new AI response
     messages_response = supabase.table("messages") \
         .select("*") \
         .eq("dialogue_id", dialog_id) \

@@ -4,6 +4,7 @@ from app.api.v1.users import router as users_router
 from app.api.v1.articles import router as articles_router
 from app.api.v1.dialogs import router as dialogs_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.user_settings import router as user_settings_router
 
 api_router = APIRouter()
 
@@ -21,3 +22,6 @@ api_router.include_router(dialogs_router, prefix="/dialogs", tags=["dialogs"])
 
 # Include admin routes
 api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
+
+# Include user settings routes
+api_router.include_router(user_settings_router, prefix="/user-settings", tags=["user-settings"])
