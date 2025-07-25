@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Json
-from typing import Dict, Any
+from typing import Dict, Any, List
+from uuid import UUID
 
 class ProcessArticleRequest(BaseModel):
     initial_lang: str
@@ -12,3 +13,11 @@ class ProcessedArticleResponse(BaseModel):
     intro: str
     dialogue_starter_question: str
     metadata: Dict[str, Any]
+
+class SimpleArticleGenerationRequest(BaseModel):
+    categories: List[str]
+
+class SimpleArticleGenerationResponse(BaseModel):
+    request_id: UUID
+    message: str
+    estimated_articles: int
