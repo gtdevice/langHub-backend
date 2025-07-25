@@ -2,6 +2,7 @@ from supabase import Client
 from app.schemas.dialogs import DialogResponse, SendMessageRequest
 from app.services.articles import get_article_by_id
 from app.services.prompt_service import PromptService
+from app.services.user_settings import get_user_settings
 
 async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_id: int) -> DialogResponse:
     # First, try to find an existing dialognew_dialog_response
@@ -9,8 +10,6 @@ async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_i
         .select("*, adapted_articles(*), messages(*)") \
         .eq("user_id", user_id) \
         .eq("adapted_article_id", adapted_article_id).maybe_single().execute() \
-        # .maybe_single() \
-        # .execute()
 
     if existing_dialog_response and existing_dialog_response.data:
         dialog_data = existing_dialog_response.data
@@ -102,8 +101,13 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
         vocabulary=vocabulary,
         grammarTopics=grammar_topics
     )
+
+    #get user settings
+    settings = get_user_settings(supabase, user_id)
     additional_args = {
-        "lang_level": "B2"  # Example language level, can be dynamic based on user profile
+        "lang_level": settings.language_level,
+        "main_language": settings.main_language,
+        "learning_language": settings.learning_language,
     }
 
     # Call LLM

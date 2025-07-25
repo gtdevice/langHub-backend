@@ -36,9 +36,9 @@ async def adapt_article(
 
     prompt_template = PromptService.get_article_adaptation_prompt()
     prompt_args = {
-        "language_level": language_level,
-        "target_lang": target_lang,
-        "initial_lang": initial_lang,
+        "lang_level": language_level,
+        "learning_language": target_lang,
+        "main_language": initial_lang,
         "article": article_text
     }
 
