@@ -1,3 +1,5 @@
+from typing import List
+
 from supabase import Client
 from app.schemas.dialogs import DialogResponse, SendMessageRequest
 from app.services.articles import get_article_by_id
@@ -40,6 +42,26 @@ async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_i
         #empty list for messages, they will be added later
         messages= []
     )
+
+async def get_all_dialogs(supabase: Client, user_id: str) -> List[DialogResponse]:
+    # Fetch all dialogs for the user
+    dialogs_response = supabase.table("dialogues") \
+        .select("*, adapted_articles(*)") \
+        .eq("user_id", user_id) \
+        .execute()
+
+    if not dialogs_response.data:
+        return []
+
+    dialogs = []
+    for dialog_data in dialogs_response.data:
+        dialogs.append(DialogResponse(
+            dialogId=dialog_data['id'],
+            article=dialog_data['adapted_articles'],
+            messages=[]  # No need to fetch messages here, they can be fetched later
+        ))
+
+    return dialogs
 
 async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, message: SendMessageRequest):
     # Save user message

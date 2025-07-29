@@ -15,47 +15,12 @@ Authorization: Bearer <your_jwt_token>
 ```
 
 ### Getting Started
-1. **Sign In**: Use the `/api/v1/auth/signin` endpoint to obtain an access token
-2. **Store Token**: Save the access token securely (localStorage, secure storage, etc.)
-3. **Include Token**: Add the token to all subsequent requests in the Authorization header
+**Include Token**: Add the token to all subsequent requests in the Authorization header
 
 ---
 
 ## API Endpoints
 
-### 🔐 Authentication Endpoints
-
-#### POST /api/v1/auth/signin
-Sign in with email and password to obtain an access token.
-
-**Request:**
-```json
-{
-  "email": "user@example.com",
-  "password": "userpassword"
-}
-```
-
-**Response:**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer",
-  "user": {
-    "id": "user-uuid",
-    "email": "user@example.com",
-    "created_at": "2024-01-01T00:00:00Z",
-    "updated_at": "2024-01-01T00:00:00Z"
-  },
-  "expires_in": 3600
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized`: Invalid credentials
-- `500 Internal Server Error`: Server-side authentication failure
-
----
 
 ### 👤 User Management Endpoints
 
@@ -279,10 +244,10 @@ Send a message to an existing dialog.
 
 ---
 
-### 🛠️ Admin Endpoints (Protected)
+### 🛠️ article managment Endpoints
 
 #### POST /api/v1/admin/article/process/{article_id}
-Process an article to create adapted versions (Admin only).
+Process an article to create adapted versions.
 
 **Headers Required:**
 - `Authorization: Bearer <token>`
@@ -302,7 +267,7 @@ Process an article to create adapted versions (Admin only).
 **Response:** Success message string
 
 #### POST /api/v1/admin/articles/generate-simple
-Generate articles for specified categories (Admin only).
+Generate articles for specified categories.
 
 **Headers Required:**
 - `Authorization: Bearer <token>`
@@ -416,17 +381,6 @@ class LangHubAPI {
     return response.json();
   }
 
-  // Authentication
-  async signIn(email, password) {
-    const response = await this.request('/api/v1/auth/signin', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    
-    this.setToken(response.access_token);
-    return response;
-  }
-
   // User settings
   async getUserSettings() {
     return this.request('/api/v1/user-settings/me');
@@ -481,43 +435,6 @@ const dialog = await api.getDialog(articles[0].id);
 const messages = await api.sendMessage(dialog.dialogId, 'My response to the article');
 ```
 
-### React Hook Example
-```javascript
-import { useState, useEffect } from 'react';
-
-function useLangHubAPI() {
-  const [api, setApi] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const apiInstance = new LangHubAPI(process.env.REACT_APP_API_URL);
-    
-    // Check for stored token
-    const token = localStorage.getItem('langhub_token');
-    if (token) {
-      apiInstance.setToken(token);
-      setIsAuthenticated(true);
-    }
-    
-    setApi(apiInstance);
-  }, []);
-
-  const signIn = async (email, password) => {
-    const response = await api.signIn(email, password);
-    localStorage.setItem('langhub_token', response.access_token);
-    setIsAuthenticated(true);
-    return response;
-  };
-
-  const signOut = () => {
-    localStorage.removeItem('langhub_token');
-    if (api) api.setToken(null);
-    setIsAuthenticated(false);
-  };
-
-  return { api, isAuthenticated, signIn, signOut };
-}
-```
 
 ---
 

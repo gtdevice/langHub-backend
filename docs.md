@@ -11,6 +11,10 @@ The core user flow is as follows:
 2.  The user starts a dialog with an AI coach about the selected article.
 3.  The AI coach provides corrections, explanations, and follow-up questions to guide the user's learning.
 
+## Important conciderations
+
+the project is an indie prodject with 1 developer. Project must be super simple. less code is better. No need in any enterprize solutions.
+
 ## Features
 
 - **User Authentication:** Secure user management with Supabase.
