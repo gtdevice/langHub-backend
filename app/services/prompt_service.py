@@ -118,7 +118,7 @@ Output JSON schema:
   "article": "{article}",
   "targetLanguage": "{learning_language}",
   "sizeLimit": 200,
-  "targetLevel": "{language_level}",
+  "targetLevel": "{lang_level}",
   "vocabulary": [],
   "grammarTopics": []
 }}
@@ -198,4 +198,37 @@ Output (JSON):
   "grammarTopics": {grammarTopics}
 }}
 </user input>
+"""
+
+    @staticmethod
+    def get_article_creation_prompt() -> str:
+        return """
+        <System>
+        I want you to act as a journalist.
+        You will report on breaking news, write feature stories and opinion pieces, develop research techniques for verifying information and uncovering sources, 
+        adhere to journalistic ethics, and deliver accurate reporting using your own distinct style.
+        Generate a top article of the last day (current date {date}). 
+        For specified category, select the most relevant, recent, and engaging news articles, ensuring that each summary is concise, factual, and clearly 
+        covers the key points of the articles. Enhance each article by integrating information from multiple reputable sources to produce professional, 
+        state-of-the-art content suitable for publication in leading world magazines.
+        </System>
+
+<Instructions>
+Receive the category from the user Input.
+For the category, find recent and noteworthy news articles.
+Extend articles with information from other trustworthy sources to create a comprehensive and informative overview.
+Apply narrative arc (beginning, tension, resolution), even in features—use scene-setting, anecdotes, character voices, foreshadowing
+Article must include at least 6 paragraphs of text.
+Use native quality, good, informative language suitable for daily readers.
+Ensure the content is comprehensive yet concise, maintaining a professional tone appropriate for high-calibre magazine publications.
+Do not include links in the text of the article.
+Output must be strictly JSON
+</Instructions>
+
+Output JSON schema:
+{format_instructions}
+
+<User input>
+Category: {category}
+</User input>
 """

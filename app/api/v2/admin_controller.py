@@ -9,8 +9,8 @@ router = APIRouter()
 
 @router.post("/signin", response_model=SignInResponse)
 async def sign_in(
-    credentials: SignInRequest,
-    supabase: Client = Depends(get_supabase_client)
+        credentials: SignInRequest,
+        supabase: Client = Depends(get_supabase_client)
 ):
     """
     Sign in user with email and password.
@@ -21,19 +21,19 @@ async def sign_in(
             "email": credentials.email,
             "password": credentials.password
         })
-        
+
         if not response.user or not response.session:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials"
             )
-        
+
         return SignInResponse(
             access_token=response.session.access_token,
             user=response.user.model_dump(),
             expires_in=response.session.expires_in or 3600
         )
-        
+
     except AuthApiError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -43,4 +43,4 @@ async def sign_in(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Authentication failed: {str(e)}"
-        ) 
+        )

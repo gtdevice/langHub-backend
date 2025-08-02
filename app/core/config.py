@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     
     # API Configuration
     api_v1_str: str = "/api/v1"
+    api_v2_str: str = "/api/v2"
 
     # OpenRouter Configuration
     openrouter_api_base: str = "https://openrouter.ai/api/v1"

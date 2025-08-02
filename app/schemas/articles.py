@@ -3,6 +3,17 @@ from datetime import datetime
 from pydantic import BaseModel, Json
 from typing import Optional, Dict, Any
 
+class AdaptedArticleCreate(BaseModel):
+    original_article_id: int
+    language: str
+    level: str
+    title: str
+    thumbnail_url: Optional[str] = None
+    intro: str
+    adapted_text: str
+    metadata: Dict[str, Any] #here was Json[]
+    dialogue_starter_question: str
+
 class AdaptedArticleData(BaseModel):
     id: int
     original_article_id: int

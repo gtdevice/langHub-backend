@@ -1,11 +1,11 @@
-from typing import Optional, Dict, Any
+from typing import Optional
 from supabase import Client
 from app.schemas.user_settings import UserSettingsCreate, UserSettingsUpdate, UserSettingsInDB
 import logging
 
 logger = logging.getLogger(__name__)
 
-
+#Reviewed. finished.
 async def create_user_settings(
     supabase: Client,
     user_id: str,

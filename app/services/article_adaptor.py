@@ -1,12 +1,13 @@
-import json
+from typing import Any, Coroutine
+
 from app.services.llmclient import callLLM
 from app.services.prompt_service import PromptService
 from supabase import Client
 import httpx
-from app.schemas.articles import AdaptedArticleData
+from app.schemas.articles import AdaptedArticleData, AdaptedArticleCreate
 from app.schemas.admin import ProcessedArticleResponse
 
-async def _save_adapted_article(article_data: AdaptedArticleData, supabase: Client) -> None:
+async def _save_adapted_article(article_data: AdaptedArticleCreate, supabase: Client) -> AdaptedArticleData:
     """
     Saves the adapted article to the database.
     """
@@ -14,6 +15,9 @@ async def _save_adapted_article(article_data: AdaptedArticleData, supabase: Clie
     response = supabase.table("adapted_articles").insert(article_data.model_dump(mode='json')).execute()
     if not response.data:
         raise httpx.HTTPStatusError("Failed to save adapted article", request=None, response=httpx.Response(500))
+    #we need to return the adapted article data
+    adapted_article = AdaptedArticleData.model_validate(response.data[0])
+    return adapted_article
 
 async def adapt_article(
     article_id: int,
@@ -21,7 +25,7 @@ async def adapt_article(
     initial_lang: str,
     target_lang: str,
     supabase: Client
-) -> ProcessedArticleResponse:
+) -> AdaptedArticleData:
     """
     Adapts an article and saves it to the database.
     """
@@ -49,8 +53,7 @@ async def adapt_article(
     )
 
     # The metadata from the LLM is a dict. We need to convert it to a JSON string.
-    adapted_article_data = AdaptedArticleData(
-        id=None,  # Let the database assign the ID
+    adapted_article_data = AdaptedArticleCreate(
         original_article_id=article_id,
         language=target_lang,
         level=language_level,
@@ -58,10 +61,10 @@ async def adapt_article(
         thumbnail_url=None,
         intro=processed_article.intro,
         adapted_text=processed_article.adapted_text,
-        metadata=json.dumps(processed_article.metadata),
+        metadata=processed_article.metadata,
         dialogue_starter_question=processed_article.dialogue_starter_question
     )
 
-    await _save_adapted_article(adapted_article_data, supabase)
+    saved_article=await _save_adapted_article(adapted_article_data, supabase)
 
-    return processed_article
+    return saved_article
