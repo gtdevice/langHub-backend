@@ -62,7 +62,8 @@ async def adapt_article(
         intro=processed_article.intro,
         adapted_text=processed_article.adapted_text,
         metadata=processed_article.metadata,
-        dialogue_starter_question=processed_article.dialogue_starter_question
+        dialogue_starter_question=processed_article.dialogue_starter_question,
+        dialogue_starter_question_translation=processed_article.dialogue_starter_question_translation
     )
 
     saved_article=await _save_adapted_article(adapted_article_data, supabase)

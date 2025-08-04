@@ -61,6 +61,7 @@ Output JSON schema:
   "adapted_text": "Die Zukunft der deutschen Industrie wird vom Klimawandel geprägt. Hitze, Dürre und Unwetter stören die Wirtschaft stark. Besonders betroffen sind Lieferketten. Studien zeigen: Extremwetter bringt Milliardenverluste. 2018 war der Rhein zu flach. Bei BASF kostete das 250 Millionen Euro. Solche Probleme können öfter kommen.",
   "intro": "Die Zukunft der deutschen Industrie wird stark vom Klimawandel beeinflusst. Extreme Wetterereignisse wie Hitze, Dürre und Unwetter haben erhebliche Auswirkungen auf die Wirtschaft, insbesondere auf die Lieferketten.",
   "dialogue_starter_question": "Wie beeinflusst der Klimawandel die deutsche Industrie und was können Unternehmen dagegen tun?",
+  "dialogue_starter_question_translation": "How does climate change affect German industry and what can companies do about it?",
   "metadata": {{
       "revisionNotes": [
         "Reduced article to under 40 words as required",
@@ -178,13 +179,15 @@ Behavior:
 Output (JSON):
 {{
   "errorReview": "<brief explanations of mistakes>",
-  "correctedResponse": "<entire corrected reply>",
-  "grammarExplanation": "<tutorial on relevant grammar>",
-  "followUpQuestion": "<new question in English>",
-  "followUpTranslation": "<German translation>",
+  "correctedResponse": "<entire corrected reply adapted to {lang_level} and a little bit more advanced>",
+  "grammarExplanation": "<If any grammar topics were not correct - explanation of the grammar>",
+  "followUpQuestion": "<new question in {learning_language}>",
+  "followUpTranslation": "<{main_language} translation>",
+  "followUpGrammarTopic": "Name of the grammar topic that was used in the answer with the explanation" // may
+        be null if none used
   "usedVocabulary": {{
-    "word1": "Übersetzung1",
-    "word2": "Übersetzung2"
+    "word1": "translation word1 from the followUpQuestion",
+    "word2": "translation word2 from the followUpQuestion",
   }}
 }}
 </AI>

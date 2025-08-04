@@ -75,7 +75,7 @@ async def get_article_by_id(supabase: Client, article_id: int) -> Optional[Adapt
     """
 
     response = supabase.table("adapted_articles").select(
-        "id, original_article_id, language, level, title, thumbnail_url, intro, adapted_text, metadata, dialogue_starter_question"
+        "id, original_article_id, language, level, title, thumbnail_url, intro, adapted_text, metadata, dialogue_starter_question, dialogue_starter_question_translation"
     ).eq("id", article_id).single().execute()
 
     if not response.data:
@@ -91,8 +91,10 @@ async def get_article_by_id(supabase: Client, article_id: int) -> Optional[Adapt
         thumbnail_url=row["thumbnail_url"],
         intro=row["intro"],
         adapted_text=row["adapted_text"],
-        metadata=json.dumps(row["metadata"]),
-        dialogue_starter_question=row["dialogue_starter_question"]
+        metadata=(row["metadata"]),
+        dialogue_starter_question=row["dialogue_starter_question"],
+        dialogue_starter_question_translation=row["dialogue_starter_question_translation"]
+
     )
 
 from app.services.dialogs import get_all_dialogs

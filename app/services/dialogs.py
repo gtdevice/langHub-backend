@@ -1,10 +1,25 @@
 from typing import List
 
 from supabase import Client
-from app.schemas.dialogs import DialogResponse, SendMessageRequest
+from app.schemas.dialogs import DialogResponse, SendMessageRequest, Message
 from app.services.articles import get_article_by_id
 from app.services.prompt_service import PromptService
 from app.services.user_settings import get_user_settings
+
+
+def format_messages(raw: list[dict]) -> List[Message]:
+    messages = []
+    for entry in raw:
+        message = Message(
+            messageId=str(entry["id"]),
+            sender=entry["speaker"],
+            text=entry["content"]["text"],
+            metadata=entry["content"].get("metadata", {}),
+            timestamp=entry['created_at']
+        )
+        messages.append(message)
+    return messages
+
 
 async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_id: int) -> DialogResponse:
     # First, try to find an existing dialognew_dialog_response
@@ -18,7 +33,7 @@ async def get_or_create_dialog(supabase: Client, user_id: str, adapted_article_i
         return DialogResponse(
             dialogId=dialog_data['id'],
             article=dialog_data['adapted_articles'],
-            messages=dialog_data['messages']
+            messages=format_messages(dialog_data['messages'])
         )
 
     # If no dialog exists, create a new one
@@ -63,7 +78,7 @@ async def get_all_dialogs(supabase: Client, user_id: str) -> List[DialogResponse
 
     return dialogs
 
-async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, message: SendMessageRequest):
+async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, message: SendMessageRequest) -> Message:
     # Save user message
     user_message_response = supabase.table("messages") \
         .insert({
@@ -125,7 +140,7 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
     )
 
     #get user settings
-    settings = get_user_settings(supabase, user_id)
+    settings = await get_user_settings(supabase, user_id)
     additional_args = {
         "lang_level": settings.language_level,
         "main_language": settings.main_language,
@@ -141,7 +156,7 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
             prompt_args=llm_request.dict() | additional_args,
             output_schema=DialogFollowUpResponseLLMSchema
         )
-        ai_text = llm_response.coachResponse.text
+        ai_text = llm_response.followUpQuestion
     except Exception as e:
         # Fallback to placeholder on error
         ai_text = "I encountered an error. Please try again."
@@ -161,10 +176,13 @@ async def add_message_to_dialog(supabase: Client, dialog_id: str, user_id: str, 
     if not ai_message_response.data:
         raise Exception("Failed to save AI message")
 
-    # Fetch all messages for the dialog including the new AI response
-    messages_response = supabase.table("messages") \
-        .select("*") \
-        .eq("dialogue_id", dialog_id) \
-        .execute()
+    # create the message response
+    message = Message(
+        messageId=str(ai_message_response.data[0]['id']),
+        sender="AI",
+        text=ai_text,
+        metadata=llm_response.dict(),
+        timestamp=ai_message_response.data[0]['created_at']
+    )
 
-    return messages_response.data
+    return message

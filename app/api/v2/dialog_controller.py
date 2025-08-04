@@ -18,7 +18,7 @@ async def get_or_create_dialog(
     """Get or create a dialog for the authenticated user and article."""
     return await get_or_create_dialog_service(auth_user.client, auth_user.user_id, adapted_article_id)
 
-@router.post("/{dialog_id}/messages", response_model=List[Message])
+@router.post("/{dialog_id}/messages", response_model=Message)
 async def send_message_to_dialog(
     dialog_id: str,
     request: SendMessageRequest,

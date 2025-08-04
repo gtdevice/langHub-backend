@@ -7,7 +7,7 @@ class Message(BaseModel):
     messageId: str
     sender: str
     text: str
-    metadata: Dict[str, Any]
+    metadata: Optional[Dict[str, Any]]
     timestamp: str
 
 class DialogResponse(BaseModel):
@@ -37,6 +37,10 @@ class CoachResponse(BaseModel):
     metadata: Dict[str, Any]
 
 class DialogFollowUpResponseLLMSchema(BaseModel):
-    userMessage: str
-    corrections: Correction
-    coachResponse: CoachResponse
+    errorReview: Optional[str]
+    correctedResponse: str
+    grammarExplanation: Optional[str]
+    followUpQuestion: str
+    followUpTranslation: str
+    followUpGrammarTopic: Optional[str] = None
+    usedVocabulary: Dict[str, str]

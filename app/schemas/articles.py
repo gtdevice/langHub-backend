@@ -13,6 +13,7 @@ class AdaptedArticleCreate(BaseModel):
     adapted_text: str
     metadata: Dict[str, Any] #here was Json[]
     dialogue_starter_question: str
+    dialogue_starter_question_translation: Optional[str] = None
 
 class AdaptedArticleData(BaseModel):
     id: int
@@ -25,6 +26,7 @@ class AdaptedArticleData(BaseModel):
     adapted_text: str
     metadata: Dict[str, Any] #here was Json[]
     dialogue_starter_question: str
+    dialogue_starter_question_translation: Optional[str] = None
 
 class DiscoverArticleData(BaseModel):
     title: str

@@ -12,6 +12,7 @@ class ProcessedArticleResponse(BaseModel):
     adapted_text: str
     intro: str
     dialogue_starter_question: str
+    dialogue_starter_question_translation: str
     metadata: Dict[str, Any]
 
 class SimpleArticleGenerationRequest(BaseModel):
