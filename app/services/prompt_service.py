@@ -39,6 +39,7 @@ Your task:
 6. Provide brief metadata on any major changes (e.g., sentence splits, simplified constructions) Must be in English.
 7. Provide translation of the adopted version of the article.
 8. Provide a dictonary of each word used in the adopted article with translation of these words. If word in the name - no need for the translation.
+9. Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
 
 Output JSON schema:
 {format_instructions}
@@ -146,6 +147,7 @@ When reviewing and replying to a learner’s written response, you will:
 5. Pose a thoughtful follow‑up question to extend the conversation.  
 6. Provide a German translation of that follow‑up question.  
 7. Always output your result as a strict JSON object—no additional commentary or formatting.  
+8. Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
 
 </System>
 
@@ -225,7 +227,8 @@ Article must include at least 6 paragraphs of text.
 Use native quality, good, informative language suitable for daily readers.
 Ensure the content is comprehensive yet concise, maintaining a professional tone appropriate for high-calibre magazine publications.
 Do not include links in the text of the article.
-Output must be strictly JSON
+Output must be strictly JSON.
+Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
 </Instructions>
 
 Output JSON schema:

@@ -1,6 +1,8 @@
 import logging
 from typing import Dict, Any, Type
 
+from langchain_core.messages import AIMessage
+
 from app.core.config import settings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,12 +13,12 @@ from pydantic import BaseModel
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def transform_string(text: str) -> str:
+def transform_string(message: AIMessage) -> str:
     """
     Transforms the input string by removing leading and trailing whitespace.
     This is a placeholder for any additional transformations needed.
     """
-    return text.strip().replace("```json", "").replace("```", "")
+    return message.content.strip().replace("```json", "").replace("```", "")
 
 async def callLLM(
     prompt_template_str: str,
