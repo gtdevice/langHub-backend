@@ -29,16 +29,16 @@ You will receive a JSON object with the following fields:
 <AI>
 Your task:
 1. Detect the source language if not explicitly provided.
-2. If the article is not already in German, translate it into German.
-3. Limit size to the 100 words.
-4. Rewrite or simplify the German text to align with a CEFR B1 proficiency level:
-   • Use vocabulary and structures appropriate for B1.
+2. If the article is not already in {learning_language}, translate it into {learning_language}.
+3. Limit size to the 250 words.
+4. Rewrite or simplify the {learning_language} text to align with a CEFR {lang_level} proficiency level:
+   • Use vocabulary and structures appropriate for {lang_level}.
    • Preserve the original meaning, tone, and key details.
-   • Break up or build up long sentences for readability according to B1 level.
-5. Return both the translated (if needed) and the adapted B2‑level version.
-6. Provide brief metadata on any major changes (e.g., sentence splits, simplified constructions) Must be in English.
-7. Provide translation of the adopted version of the article.
-8. Provide a dictonary of each word used in the adopted article with translation of these words. If word in the name - no need for the translation.
+   • Break up or build up long sentences for readability according to {lang_level} level.
+5. Check and fix the adapted {lang_level}‑level version.
+6. Provide brief metadata on any major changes (e.g., sentence splits, simplified constructions) Must be in {main_language}.
+7. Provide translation to the {main_language} of the adopted version of the article.
+8. Provide a dictionary of each word used in the adopted article with translation to {main_language} language of these words. If word in the name - no need for the translation.
 9. Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
 
 Output JSON schema:
@@ -141,11 +141,11 @@ You will receive the conversation history and the user's latest message.
 Your response must be in JSON format.
 When reviewing and replying to a learner’s written response, you will:
 1. Analyze for vocabulary usage, grammatical accuracy, and overall fluency.  
-2. Explain each error in clear, student‑friendly terms.  
+2. Explain each error in clear, student‑friendly terms using {main_language} language.  
 3. Model the correct version of the learner’s sentence(s).  
 4. Offer a concise tutorial on any relevant grammar topics that arose.  
 5. Pose a thoughtful follow‑up question to extend the conversation.  
-6. Provide a German translation of that follow‑up question.  
+6. Provide a translation of that follow‑up question to the {main_language}.  
 7. Always output your result as a strict JSON object—no additional commentary or formatting.  
 8. Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
 
@@ -175,7 +175,7 @@ Behavior:
 3. Supply a corrected version of the entire reply.
 4. If any target grammar topics were misused or omitted, include a brief tutorial note.
 5. Propose a relevant follow‑up question to advance the dialogue.
-6. Translate that follow‑up question into German.
+6. Translate that follow‑up question into {learning_language}.
 7. List any vocabulary items you used in your correction or follow‑up, with their translations.
 
 Output (JSON):
