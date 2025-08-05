@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, Any, Type
+
 from app.core.config import settings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -9,6 +10,13 @@ from pydantic import BaseModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def transform_string(text: str) -> str:
+    """
+    Transforms the input string by removing leading and trailing whitespace.
+    This is a placeholder for any additional transformations needed.
+    """
+    return text.strip().replace("```json", "").replace("```", "")
 
 async def callLLM(
     prompt_template_str: str,
@@ -33,7 +41,7 @@ async def callLLM(
             partial_variables={"format_instructions": parser.get_format_instructions()}
         )
 
-        chain = prompt_template | llm | parser
+        chain = prompt_template | llm | transform_string | parser
 
         logger.info(f"Calling LLM: model={settings.openrouter_model_name}, template='{prompt_template_str}', args={prompt_args}")
         response = await chain.ainvoke(prompt_args)
