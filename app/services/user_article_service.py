@@ -84,6 +84,7 @@ class UserArticleService:
         categories = user_preferences.preferred_categories if user_preferences else []
         language = user_preferences.learning_language if user_preferences else None
         level = user_preferences.language_level if user_preferences else None
+        main_language = user_preferences.main_language if user_preferences else None
         
         # Get the last assigned article ID for this user
         last_response = self.supabase.table("user_x_adopted_article").select(
@@ -145,7 +146,7 @@ class UserArticleService:
                 adapted_article = await article_adaptor.adapt_article(
                     article_id=article,
                     language_level=level,
-                    initial_lang=language,
+                    initial_lang=main_language,
                     target_lang=language,
                     supabase=self.supabase
                 )

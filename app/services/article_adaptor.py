@@ -37,13 +37,16 @@ async def adapt_article(
 
     article_data = response.data
     article_text = article_data.get("original_text")
+    #replace double quotes with single quotes to avoid issues with JSON parsing
+    article_text = article_text.replace('"', "'")
 
     prompt_template = PromptService.get_article_adaptation_prompt()
     prompt_args = {
         "lang_level": language_level,
         "learning_language": target_lang,
         "main_language": initial_lang,
-        "article": article_text
+        "article": article_text,
+        "size_limit": 250,
     }
 
     processed_article = await callLLM(
