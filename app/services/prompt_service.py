@@ -60,6 +60,7 @@ Then, construct a valid JSON object with these fields:
 
 Ensure:
 * All words in the dictionary are relevant to the adapted text and correctly translated
+* All words from the adapted text are included in the dictionary
 * All keys use **double quotes**.
 * All string values use **double quotes**.
 * The object is fully parsable and contains **no markdown, headers, or explanations**.
@@ -99,6 +100,7 @@ When reviewing and replying to a learner’s written response, you will:
 6. Provide a translation of that follow‑up question to the {main_language}.  
 7. Always output your result as a strict JSON object—no additional commentary or formatting.  
 8. Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
+**Make sure that follow‑up question is relevant to the article and ongoing dialog, and encourages further discussion.**
 
 </System>
 
@@ -154,36 +156,42 @@ Output (JSON):
   "grammarTopics": {grammarTopics}
 }}
 </user input>
+
+Ensure:
+* All mistakes are explained in clear, student-friendly terms.
+* The corrected response is fully adapted to {lang_level} level.
+* The follow-up question is relevant to the article and ongoing dialog and encourages further discussion.
+
 """
 
     @staticmethod
     def get_article_creation_prompt() -> str:
         return """
         <System>
-        I want you to act as a journalist.
+        I want you to act as a journalist and article writer.
         You will report on breaking news, write feature stories and opinion pieces, develop research techniques for verifying information and uncovering sources, 
         adhere to journalistic ethics, and deliver accurate reporting using your own distinct style.
-        Generate a top article of the last day (current date {date}). 
+        Generate a most discussing and important article of the last day (current date {date}). 
         For specified category, select the most relevant, recent, and engaging news articles, ensuring that each summary is concise, factual, and clearly 
         covers the key points of the articles. Enhance each article by integrating information from multiple reputable sources to produce professional, 
-        state-of-the-art content suitable for publication in leading world magazines.
-        </System>
+        state-of-the-art content suitable for publication in leading world magazines. All articles must be written in a way of good article with a narrative arc, opening, tension, and resolution and opinion.
 
-<Instructions>
 Receive the category from the user Input.
 For the category, find recent and noteworthy news articles.
 Extend articles with information from other trustworthy sources to create a comprehensive and informative overview.
 Apply narrative arc (beginning, tension, resolution), even in features—use scene-setting, anecdotes, character voices, foreshadowing
-Article must include at least 6 paragraphs of text.
+Article must include at least 8 paragraphs of text. And at least 1000 words.
 Use native quality, good, informative language suitable for daily readers.
 Ensure the content is comprehensive yet concise, maintaining a professional tone appropriate for high-calibre magazine publications.
 Do not include links in the text of the article.
 Output must be strictly JSON.
 Ensure the output is valid JSON as it will be parsed using `json.loads()` in Python. Do not use quotes around the keys in the JSON object. Use single quotes for string values only if necessary.
-</Instructions>
+
 
 Output JSON schema:
 {format_instructions}
+
+</System>
 
 <User input>
 Category: {category}

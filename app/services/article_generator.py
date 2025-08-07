@@ -41,7 +41,8 @@ class SimpleArticleService:
         response = await callLLM(
             prompt_template_str=prompt,
             prompt_args={"category": category, "date": date },
-            output_schema=ArticleResponse
+            output_schema=ArticleResponse,
+            extended_model=True
         )
 
         return response.dict()

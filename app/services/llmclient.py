@@ -15,6 +15,7 @@ from langchain.output_parsers import OutputFixingParser
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+extended_model_name = "perplexity/sonar-reasoning"  # expencive model for reasoning tasks
 
 def wrapper_repair_json(input):
     res = repair_json(input)
@@ -31,7 +32,8 @@ def transform_string(message: AIMessage) -> str:
 async def callLLM(
     prompt_template_str: str,
     prompt_args: Dict[str, Any],
-    output_schema: Type[BaseModel]
+    output_schema: Type[BaseModel],
+    extended_model: bool = False
 ) -> BaseModel:
     """
     Calls the OpenRouter API with a given prompt template and arguments using LangChain.
@@ -39,7 +41,7 @@ async def callLLM(
     """
     try:
         llm = ChatOpenAI(
-            model=settings.openrouter_model_name,
+            model=settings.openrouter_model_name if not extended_model else extended_model_name,
             openai_api_key=settings.openrouter_api_key,
             openai_api_base=settings.openrouter_api_base,
             max_retries=3,
