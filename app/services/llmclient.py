@@ -15,7 +15,7 @@ from langchain.output_parsers import OutputFixingParser
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-extended_model_name = "perplexity/sonar-reasoning"  # expencive model for reasoning tasks
+extended_model_name = "openai/gpt-4.1-mini"  # expencive model for reasoning tasks
 
 def wrapper_repair_json(input):
     res = repair_json(input)
@@ -46,6 +46,10 @@ async def callLLM(
             openai_api_base=settings.openrouter_api_base,
             max_retries=3,
         )
+        if extended_model:
+            logger.info(f"Using extended model: {extended_model_name}")
+            tool = {"type": "web_search_preview"}
+            llm = llm.bind_tools([tool])
 
         parser = PydanticOutputParser(pydantic_object=output_schema)
         new_parser = OutputFixingParser.from_llm(parser=parser, llm=llm)
