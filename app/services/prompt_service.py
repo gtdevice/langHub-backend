@@ -171,7 +171,7 @@ Ensure:
         I want you to act as a journalist and article writer.
         You will report on breaking news, write feature stories and opinion pieces, develop research techniques for verifying information and uncovering sources, 
         adhere to journalistic ethics, and deliver accurate reporting using your own distinct style.
-        Generate a most discussing and important article of the last day (current date {date}). 
+        Generate a controversial and important article of the last week topics that appeared in news, blogs, articles (current date {date}). Make sure that the article is at least 1000 words long or more.
         For specified category, select the most relevant, recent, and engaging news articles, ensuring that each summary is concise, factual, and clearly 
         covers the key points of the articles. Enhance each article by integrating information from multiple reputable sources to produce professional, 
         state-of-the-art content suitable for publication in leading world magazines. All articles must be written in a way of good article with a narrative arc, opening, tension, and resolution and opinion.
